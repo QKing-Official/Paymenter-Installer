@@ -32,6 +32,12 @@ apt -y install php8.3 php8.3-{common,cli,gd,mysql,mbstring,bcmath,xml,fpm,curl,z
 echo "Installing Composer..."
 curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
+# Setting up Redis
+echo 'Setting up Redis'
+sudo mkdir -p /var/run/redis
+sudo chown redis:redis /var/run/redis
+systemctl start redis-server
+
 # Create Paymenter directory
 echo "Creating Paymenter directory..."
 mkdir -p /var/www/paymenter
