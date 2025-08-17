@@ -37,6 +37,7 @@ This will:
 ## Notes
 - The script currently configures Nginx for non-SSL only. For SSL, manual configuration is required.
 - This script is intended to be run only once. Re-running may cause issues.
+- Full credits to the [Paymenter](https://github.com/Paymenter/Paymenter), Corwin and all other contributors of Paymenter.
 
 ## License
 Use this script at your own risk. By running it, you agree to the license.
