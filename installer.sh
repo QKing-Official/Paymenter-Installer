@@ -7,6 +7,28 @@ echo " / ___/ _ \`/ // /  ' \/ -_) _ \/ __/ -_) __/ _/ // _ \(_-</ __/ _ \`/ / /
 echo "/_/   \_,_/\_, /_/_/_/\__/_//_/\__/\__/_/   /___/_//_/___/\__/\_,_/_/_/\__/_/   "
 echo "          /___/                                                                  "
 echo "By QKing"
+
+# License agreement
+echo "Using this script you agree to the license and use it at your own risk."
+read -p "Do you accept? (y/N): " agree
+
+if [[ "$agree" != "y" && "$agree" != "Y" ]]; then
+    echo "You did not accept the license. Exiting..."
+    exit 1
+fi
+
+# Installation confirmation
+echo "This script can only be run once!"
+read -p "Do you want to proceed with the installation? (y/N): " proceed
+
+if [[ "$proceed" != "y" && "$proceed" != "Y" ]]; then
+    echo "Installation aborted."
+    exit 1
+fi
+
+# If accepted, continue
+echo "Starting installation..."
+
 # Ask user for inputs
 read -p "Enter your Paymenter database username [paymenter]: " DB_USER
 DB_USER=${DB_USER:-paymenter}
