@@ -126,6 +126,9 @@ server {
 EOF
 
 ln -s /etc/nginx/sites-available/paymenter.conf /etc/nginx/sites-enabled/
+sudo rm -f /etc/nginx/sites-enabled/default
+sudo rm -f /etc/nginx/sites-available/default
+sudo rm -f /etc/nginx/conf.d/default.conf
 systemctl restart nginx
 
 # Set correct permissions
