@@ -40,4 +40,4 @@ This will:
 - Full credits too [Paymenter](https://github.com/Paymenter/Paymenter), Corwin and all other contributors of Paymenter.
 
 ## License
-Use this script at your own risk. By running it, you agree to the license.
+Use this script at your own risk. By running it, you agree to the QKOL v3.0 license.
