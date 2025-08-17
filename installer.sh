@@ -1,8 +1,12 @@
 #!/bin/bash
 set -e
 
-echo "=== Paymenter Installation Script ==="
-
+echo "   ___                           __            ____         __       ____       "
+echo "  / _ \___ ___ ____ _  ___ ___  / /____ ____  /  _/__  ___ / /____ _/ / /__ ____"
+echo " / ___/ _ \`/ // /  ' \/ -_) _ \/ __/ -_) __/ _/ // _ \(_-</ __/ _ \`/ / / -_) __/"
+echo "/_/   \_,_/\_, /_/_/_/\__/_//_/\__/\__/_/   /___/_//_/___/\__/\_,_/_/_/\__/_/   "
+echo "          /___/                                                                  "
+echo "By QKing"
 # Ask user for inputs
 read -p "Enter your Paymenter database username [paymenter]: " DB_USER
 DB_USER=${DB_USER:-paymenter}
@@ -12,7 +16,7 @@ echo
 read -p "Enter your Paymenter database name [paymenter]: " DB_NAME
 DB_NAME=${DB_NAME:-paymenter}
 
-read -p "Enter your Paymenter domain (example.com): " APP_URL
+read -p "Enter your Paymenter domain/IP used for the Webserver configuration (without https://): " APP_URL
 
 # Update system and install dependencies
 echo "Installing dependencies..."
@@ -64,6 +68,7 @@ FLUSH PRIVILEGES;
 MYSQL_SCRIPT
 
 # Setup .env
+echo "Setting up the .env..."
 cp .env.example .env
 php artisan key:generate --force
 php artisan storage:link
@@ -74,11 +79,20 @@ sed -i "s/DB_USERNAME=.*/DB_USERNAME=$DB_USER/" .env
 sed -i "s/DB_PASSWORD=.*/DB_PASSWORD=$DB_PASS/" .env
 
 # Setup database tables and seed
+echo "Migrating database..."
 php artisan migrate --force --seed
+
+
+# App and user initialisation
+echo "Waiting for user input for app initialisation..."
 php artisan app:init
+echo "User input received"
+echo "Waiting for user input for user creation..."
 php artisan app:user:create
+echo "User input received"
 
 # Setup cronjob
+echo "Setting up cronjob..."
 (crontab -l 2>/dev/null; echo "* * * * * php /var/www/paymenter/artisan schedule:run >> /dev/null 2>&1") | crontab -
 
 # Setup queue worker service
@@ -105,6 +119,8 @@ systemctl enable --now redis-server
 
 # Nginx setup
 echo "Setting up Nginx configuration..."
+echo "Type: Non-SSL (currently only supported)"
+echo "For SSL please manually change this"
 cat <<EOF >/etc/nginx/sites-available/paymenter.conf
 server {
     listen 80;
@@ -130,9 +146,11 @@ sudo rm -f /etc/nginx/sites-enabled/default
 sudo rm -f /etc/nginx/sites-available/default
 sudo rm -f /etc/nginx/conf.d/default.conf
 systemctl restart nginx
+echo "Nginx configuration succesfull"
 
 # Set correct permissions
+echo "Setting the correct permissions"
 chown -R www-data:www-data /var/www/paymenter/*
 
-echo "=== Installation Complete! ==="
+echo "Installation Complete!"
 echo "Visit your app at http://$APP_URL"
