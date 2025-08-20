@@ -219,7 +219,14 @@ server {
 EOF
 sudo apt install -y python3-certbot-nginx
 sudo systemctl stop nginx
-sudo kill -9 $(sudo lsof -t -i :80)
+PID=$(sudo lsof -t -i :80)
+if [ -n "$PID" ]; then
+    sudo kill $PID
+    echo "Killed process $PID on port 80"
+else
+    echo "No process found on port 80"
+fi
+
 sudo systemctl stop nginx
 certbot certonly --nginx -d $APP_URL
 (crontab -l 2>/dev/null; echo "0 23 * * * certbot renew --quiet --deploy-hook 'systemctl restart nginx'") | crontab -
