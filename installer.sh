@@ -94,12 +94,41 @@ composer install --no-dev --optimize-autoloader
 
 # Setup database
 echo "Setting up database..."
-mysql -u root <<MYSQL_SCRIPT
-CREATE USER IF NOT EXISTS '$DB_USER'@'127.0.0.1' IDENTIFIED BY '$DB_PASS';
-CREATE DATABASE IF NOT EXISTS $DB_NAME;
-GRANT ALL PRIVILEGES ON $DB_NAME.* TO '$DB_USER'@'127.0.0.1' WITH GRANT OPTION;
-FLUSH PRIVILEGES;
-MYSQL_SCRIPT
+
+# Check if user exists
+USER_EXISTS=$(mysql -u root -sse "SELECT EXISTS(SELECT 1 FROM mysql.user WHERE user = '$DB_USER');")
+if [ "$USER_EXISTS" -eq 1 ]; then
+    read -p "User '$DB_USER' already exists. Remove user and associated database? [N/y] " response
+    response=${response:-N}
+    if [[ "$response" =~ ^[Yy]$ ]]; then
+        echo "Removing user and database..."
+        mysql -u root -e "DROP USER '$DB_USER'@'127.0.0.1';"
+        mysql -u root -e "DROP DATABASE IF EXISTS $DB_NAME;"
+    else
+        echo "Aborting setup."
+        exit 1
+    fi
+fi
+
+# User Creation
+mysql -u root -e "CREATE USER '$DB_USER'@'127.0.0.1' IDENTIFIED BY '$DB_PASS';"
+if [ $? -ne 0 ]; then
+    echo "Error creating user '$DB_USER'."
+    exit 1
+fi
+
+# Database Creation
+mysql -u root -e "CREATE DATABASE $DB_NAME;"
+if [ $? -ne 0 ]; then
+    echo "Error creating database '$DB_NAME'."
+    exit 1
+fi
+
+# Finish the database setup
+mysql -u root -e "GRANT ALL PRIVILEGES ON $DB_NAME.* TO '$DB_USER'@'127.0.0.1' WITH GRANT OPTION; FLUSH PRIVILEGES;"
+
+echo "Database '$DB_NAME' and user '$DB_USER' set up successfully."
+
 
 # Setup .env
 echo "Setting up the .env..."
@@ -187,6 +216,12 @@ server {
 }
 
 EOF
+sudo apt install -y python3-certbot-nginx
+sudo systemctl stop nginx
+sudo kill -9 $(sudo lsof -t -i :80)
+sudo systemctl stop nginx
+certbot certonly --nginx -d $APP_URL
+(crontab -l 2>/dev/null; echo "0 23 * * * certbot renew --quiet --deploy-hook 'systemctl restart nginx'") | crontab -
 else
 cat <<EOF >/etc/nginx/sites-available/paymenter.conf
 server {
