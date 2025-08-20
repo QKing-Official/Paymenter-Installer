@@ -256,6 +256,7 @@ echo "SSL: $SSL"
 # Set correct permissions
 echo "Setting the correct permissions"
 chown -R www-data:www-data /var/www/paymenter/*
+chmod -R 755 storage/* bootstrap/cache/
 
 echo "Installation Complete!"
 echo "Visit your app at http://$APP_URL"
