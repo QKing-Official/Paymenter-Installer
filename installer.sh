@@ -40,7 +40,7 @@ echo
 read -p "Enter your Paymenter database name [paymenter]: " DB_NAME
 DB_NAME=${DB_NAME:-paymenter}
 
-read -p "Enter your Paymenter domain/IP used for the Webserver configuration (without https://): " APP_URL
+read -p "Enter your Paymenter domain/IP used for the Webserver configuration (without http(s)://): " APP_URL
 
 read -p "Enable SSL? (For domain only! For ssl make an A record to $IP (y/N): " SSL
 
@@ -99,7 +99,7 @@ echo "Setting up database..."
 # Check if user exists
 USER_EXISTS=$(mysql -u root -sse "SELECT EXISTS(SELECT 1 FROM mysql.user WHERE user = '$DB_USER');")
 if [ "$USER_EXISTS" -eq 1 ]; then
-    read -p "User '$DB_USER' already exists. Remove user and associated database? [N/y] " response
+    read -p "User '$DB_USER' already exists. Remove user and associated database? [y/N] " response
     response=${response:-N}
     if [[ "$response" =~ ^[Yy]$ ]]; then
         echo "Removing user and database..."
@@ -135,7 +135,7 @@ echo "Database '$DB_NAME' and user '$DB_USER' set up successfully."
 echo "Setting up the .env..."
 cp .env.example .env
 php artisan key:generate --force
-php artisan storage:link
+[ -L public/storage ] && rm public/storage; php artisan storage:link
 
 # Update .env with user info
 sed -i "s/DB_DATABASE=.*/DB_DATABASE=$DB_NAME/" .env
@@ -267,4 +267,5 @@ chown -R www-data:www-data /var/www/paymenter/*
 chmod -R 755 storage/* bootstrap/cache/
 
 echo "Installation Complete!"
+echo "If this doesn't work contact me on discord. Username: qkingsoftware
 echo "Visit your app at http://$APP_URL"
