@@ -42,7 +42,7 @@ DB_NAME=${DB_NAME:-paymenter}
 
 read -p "Enter your Paymenter domain/IP used for the Webserver configuration (without http(s)://): " APP_URL
 
-read -p "Enable SSL? (For domain only! For ssl make an A record to $IP (y/N): " SSL
+read -p "[BETA! Use on your own risk!] Enable SSL? (For domain only! For ssl make an A record to $IP (y/N): " SSL
 
 # Default to "N" if empty
 SSL=${SSL:-N}
@@ -183,8 +183,7 @@ systemctl enable --now redis-server
 
 # Nginx setup
 echo "Setting up Nginx configuration..."
-echo "Type: Non-SSL (currently only supported)"
-echo "For SSL please manually change this"
+echo "SSL: $SSL"
 
 if [[ "$SSL" != "y" && "&SSL" != "Y" ]]; then
 cat <<EOF >/etc/nginx/sites-available/paymenter.conf
