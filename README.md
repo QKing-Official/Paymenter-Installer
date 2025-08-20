@@ -2,6 +2,7 @@
 
 This repository provides a one-time-use bash script to automatically install and configure Paymenter.
 It sets up all required dependencies, database, PHP environment, Redis, Nginx, and more.
+Don't ask Corwin or the Paymenter discord for any issues with this installer, this is not Official!
 
 ## Features
 - Installs PHP 8.3, MariaDB 10.11, Redis, Composer, and Nginx
