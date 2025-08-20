@@ -10,7 +10,7 @@ Don't ask Corwin or the Paymenter discord for any issues with this installer, th
 - Sets up Paymenter application files and environment
 - Runs database migrations and seeds
 - Creates a systemd service for queue workers
-- Configures Nginx for non-SSL access
+- Configures Nginx for non-SSL or SSL
 - Sets up a cron job for Laravel schedule
 
 ## Requirements
@@ -36,7 +36,7 @@ This will:
 - Cron job is set to run Laravel scheduler every minute
 
 ## Notes
-- The script currently configures Nginx for non-SSL only. For SSL, manual configuration is required.
+- The script currently configures Nginx for non-SSL only. For SSL you can use the ssl option in the installer (Use at your own risk!)
 - This script is intended to be run only once. Re-running may cause issues.
 - Full credits too [Paymenter](https://github.com/Paymenter/Paymenter), Corwin and all other contributors of Paymenter.
 
