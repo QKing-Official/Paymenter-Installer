@@ -8,6 +8,7 @@ echo "/_/   \_,_/\_, /_/_/_/\__/_//_/\__/\__/_/   /___/_//_/___/\__/\_,_/_/_/\__
 echo "          /___/                                                                  "
 echo "By QKing"
 
+IP=$(curl -s https://api.ipify.org)
 # License agreement
 echo "Using this script you agree to the license and use it at your own risk."
 read -p "Do you accept? (y/N): " agree
@@ -39,6 +40,17 @@ read -p "Enter your Paymenter database name [paymenter]: " DB_NAME
 DB_NAME=${DB_NAME:-paymenter}
 
 read -p "Enter your Paymenter domain/IP used for the Webserver configuration (without https://): " APP_URL
+
+read -p "Enable SSL? (For domain only! For ssl make an A record to $IP (y/N): " SSL
+
+# Default to "N" if empty
+SSL=${SSL:-N}
+
+if [[ "$SSL" == "y" || "$SSL" == "Y" ]]; then
+    SSL="Y"
+else
+    SSL="N"
+fi
 
 # Update system and install dependencies
 echo "Installing dependencies..."
@@ -143,6 +155,39 @@ systemctl enable --now redis-server
 echo "Setting up Nginx configuration..."
 echo "Type: Non-SSL (currently only supported)"
 echo "For SSL please manually change this"
+
+if [[ "$SSL" != "y" && "&SSL" != "Y" ]]; then
+cat <<EOF >/etc/nginx/sites-available/paymenter.conf
+server {
+    listen 80;
+    listen [::]:80;
+    server_name $APP_URL;
+    return 301 https://$host$request_uri;
+}
+
+server {
+    listen 443 ssl http2;
+    listen [::]:443 ssl http2;
+    server_name $APP_URL;
+    root /var/www/paymenter/public;
+
+    index index.php;
+
+    ssl_certificate /etc/letsencrypt/live/$APP_URL/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/$APP_URL/privkey.pem;
+
+    location / {
+        try_files $uri $uri/ /index.php?$query_string;
+    }
+
+    location ~ \.php$ {
+        include snippets/fastcgi-php.conf;
+        fastcgi_pass unix:/var/run/php/php8.3-fpm.sock;
+    }
+}
+
+EOF
+else
 cat <<EOF >/etc/nginx/sites-available/paymenter.conf
 server {
     listen 80;
@@ -161,7 +206,9 @@ server {
         fastcgi_pass unix:/var/run/php/php8.3-fpm.sock;
     }
 }
+
 EOF
+fi
 
 ln -s /etc/nginx/sites-available/paymenter.conf /etc/nginx/sites-enabled/
 sudo rm -f /etc/nginx/sites-enabled/default
@@ -169,6 +216,7 @@ sudo rm -f /etc/nginx/sites-available/default
 sudo rm -f /etc/nginx/conf.d/default.conf
 systemctl restart nginx
 echo "Nginx configuration succesfull"
+echo "SSL: $SSL"
 
 # Set correct permissions
 echo "Setting the correct permissions"
