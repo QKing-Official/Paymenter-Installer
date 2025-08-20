@@ -1,4 +1,6 @@
-# Paymenter Auto-Installer
+# Paymenter Auto-Installer BETA
+
+### Test on your own risk, may contain bugs!
 
 This repository provides a one-time-use bash script to automatically install and configure Paymenter.
 It sets up all required dependencies, database, PHP environment, Redis, Nginx, and more.
