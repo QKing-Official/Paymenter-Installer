@@ -23,7 +23,7 @@ It sets up all required dependencies, database, PHP environment, Redis, Nginx, a
 ## One-Line Installer
 To install Paymenter automatically, run this command:
 ```bash
-command -v curl >/dev/null 2>&1 || { echo "curl is required. Please install it first."; exit 1; }; bash <(curl -sSL https://raw.githubusercontent.com/QKing-Official/Paymenter-Installer/main/installer.sh)
+command -v curl >/dev/null 2>&1 || { echo "curl is required. Please install it first."; exit 1; }; bash <(curl -sSL https://raw.githubusercontent.com/QKing-Official/Paymenter-Installer/beta/installer.sh)
 ```
 This will:
 1. Check that curl is installed.
