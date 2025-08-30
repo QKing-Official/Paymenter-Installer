@@ -184,7 +184,7 @@ systemctl enable --now redis-server
 echo "Setting up Nginx configuration..."
 echo "SSL: $SSL"
 
-if [[ "$SSL" != "y" && "&SSL" != "Y" ]]; then
+if [[ "$SSL" != "y" && "$SSL" != "Y" ]]; then
 cat <<EOF >/etc/nginx/sites-available/paymenter.conf
 server {
     listen 80;
